@@ -17,17 +17,24 @@ jobs:
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         source: "index.php"
-        target: "/home/vmadmin"
+        target: "/home/vmadmin" # Vẫn copy vào thư mục home
 
-    - name: Deploy file, Remove index.html, and Restart
+    - name: Deploy file to the correct website
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM_HOST }}
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
-          sudo rm -f /var/www/html/index.php # Xóa file .php cũ (nếu có)
-          sudo rm -f /var/www/html/index.html # <-- LỆNH QUAN TRỌNG: XÓA FILE .HTML
-          sudo mv /home/vmadmin/index.php /var/www/html/index.php # Di chuyển file .php mới vào
-          sudo chown www-data:www-data /var/www/html/index.php
+          # DÒNG QUAN TRỌNG: Cập nhật file ở /var/www/my-website/
+          sudo rm -f /var/www/my-website/index.php
+          sudo mv /home/vmadmin/index.php /var/www/my-website/index.php
+          
+          # Cấp quyền cho file mới
+          sudo chown www-data:www-data /var/www/my-website/index.php
+          
+          # Xóa file index.html cũ (nếu có)
+          sudo rm -f /var/www/my-website/index.html
+          
+          # Khởi động lại Apache
           sudo systemctl restart apache2
