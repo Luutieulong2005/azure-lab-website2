@@ -1,0 +1,30 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    [cite_start]branches: [ master ] # Kích hoạt khi push lên nhánh "main" [cite: 295-297]
+
+jobs:
+  deploy:
+    [cite_start]runs-on: ubuntu-latest # Chạy trên một máy ảo Ubuntu [cite: 300]
+    steps:
+    - uses: actions/checkout@v2 # Bước 1: Lấy code từ repo của bạn về
+
+    - [cite_start]name: Copy files to VM via SCP # Bước 2: Sao chép file vào VM [cite: 303-304]
+      uses: appleboy/scp-action@master
+      with:
+        [cite_start]host: ${{ secrets.VM_HOST }} # Lấy IP từ secret [cite: 306]
+        [cite_start]username: azureuser # Username bạn đã tạo cho VM [cite: 307]
+        [cite_start]key: ${{ secrets.VM_SSH_KEY }} # Lấy SSH key từ secret [cite: 308]
+        [cite_start]source: "index.php" # File cần copy [cite: 309]
+        [cite_start]target: "/var/www/html/" # Nơi dán file trên VM [cite: 310]
+
+    - [cite_start]name: Set permissions and restart Apache # Bước 3: Chạy lệnh trên VM [cite: 311-312]
+      uses: appleboy/ssh-action@master
+      with:
+        [cite_start]host: ${{ secrets.VM_HOST }} # Lấy IP từ secret [cite: 314]
+        [cite_start]username: azureuser # Username VM [cite: 315]
+        [cite_start]key: ${{ secrets.VM_SSH_KEY }} # Lấy SSH key từ secret [cite: 316]
+        script: |
+          sudo chown www-data:www-data /var/www/html/index.php
+          sudo systemctl restart apache2
