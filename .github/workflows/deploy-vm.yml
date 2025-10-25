@@ -17,16 +17,17 @@ jobs:
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         source: "index.php"
-        target: "/home/vmadmin" # Vẫn copy vào thư mục home
+        target: "/home/vmadmin"
 
-    - name: Move file, set permissions, and restart Apache
+    - name: Deploy file, Remove index.html, and Restart
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM_HOST }}
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
-          sudo rm -f /var/www/html/index.php # <-- THÊM LỆNH XÓA FILE CŨ
-          sudo mv /home/vmadmin/index.php /var/www/html/index.php # Di chuyển file mới vào
+          sudo rm -f /var/www/html/index.php # Xóa file .php cũ (nếu có)
+          sudo rm -f /var/www/html/index.html # <-- LỆNH QUAN TRỌNG: XÓA FILE .HTML
+          sudo mv /home/vmadmin/index.php /var/www/html/index.php # Di chuyển file .php mới vào
           sudo chown www-data:www-data /var/www/html/index.php
           sudo systemctl restart apache2
