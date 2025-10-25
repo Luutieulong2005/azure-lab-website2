@@ -2,24 +2,24 @@ name: Deploy to Azure VM
 
 on:
   push:
-    branches: [ master ] # Kích hoạt khi push lên nhánh "main" [cite: 270-271]
+    [cite_start]branches: [ master ] # Bạn đang dùng nhánh "master", hãy đổi [ main ] thành [ master ] nếu cần 
 
 jobs:
   deploy:
-    [cite_start]runs-on: ubuntu-latest # Chạy trên một máy ảo Ubuntu [cite: 300]
+    runs-on: ubuntu-latest # Chạy trên một máy ảo Ubuntu
     steps:
-    - [cite_start]uses: actions/checkout@v2 # Bước 1: Lấy code về [cite: 302]
+    - uses: actions/checkout@v2 # Bước 1: Lấy code về
 
-    - name: Copy files to VM via SCP 
+    - name: Copy files to VM via SCP
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.VM_HOST }} 
+        host: ${{ secrets.VM_HOST }}
         username: vmadmin # Đảm bảo đây là username của bạn
-        key: ${{ secrets.VM_SSH_KEY }} 
-        source: "index.php" 
-        target: "/var/www/html/" 
+        key: ${{ secrets.VM_SSH_KEY }}
+        source: "index.php"
+        target: "/var/www/html/"
 
-    - name: Set permissions and restart Apache 
+    - name: Set permissions and restart Apache
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM_HOST }}
