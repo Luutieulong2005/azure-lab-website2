@@ -17,14 +17,15 @@ jobs:
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         source: "index.php"
-        target: "/var/www/html/"
+        target: "/home/vmadmin"
 
-    - name: Set permissions and restart Apache
+    - name: Move file, set permissions, and restart Apache
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VM_HOST }}
         username: vmadmin
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
+          sudo mv /home/vmadmin/index.php /var/www/html/index.php # <-- THÊM DÒNG NÀY
           sudo chown www-data:www-data /var/www/html/index.php
           sudo systemctl restart apache2
